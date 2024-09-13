@@ -83,11 +83,19 @@ class BasicMover:
 
     def move_in_a_circle(self, r):
         """Moves the robot in a circle with radius `r`"""
-        time = 30
-        speed = 2*r*math.pi / time
-        angle = 2*math.pi / time
+        rate = rospy.Rate(10)
+        time = 20  # time to complete a circle
+
+        angular_velocity = (2 * math.pi) / time
+        linear_velocity = angular_velocity * r
+
+        twist = Twist()
+        twist.linear.x = linear_velocity 
+        twist.angular.z = angular_velocity  
 
         while not rospy.is_shutdown():
+            self.cmd_vel_pub.publish(twist)
+            rate.sleep()
 
         
     def rotate_in_place(self):
@@ -104,6 +112,6 @@ class BasicMover:
 if __name__ == '__main__':
     rospy.init_node('basic_mover')
     #BasicMover().out_and_back(1)
-    BasicMover().draw_square(1)
-    # BasicMover().move_in_a_circle(1)
+    #BasicMover().draw_square(1)
+    BasicMover().move_in_a_circle(1)
     # BasicMover().rotate_in_place()
