@@ -1,0 +1,7 @@
+<launch>
+    <!-- Launch my_odom node -->
+    <node pkg="zared" type="my_odom.py" name="my_odom" output="screen"/>
+    
+    <!-- Launch mover node -->
+    <node pkg="zared" type="basic_mover.py" name="mover" output="screen"/>
+</launch>

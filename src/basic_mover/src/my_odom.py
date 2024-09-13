@@ -22,19 +22,32 @@ class MyOdom:
         self.publish_data()
 
     def update_dist(self, cur_pose):
-        """
-        Helper to `odom_cb`.
-        Updates `self.dist` to the distance between `self.old_pose` and
-        `cur_pose`.
-        """
-        raise NotImplementedError
+        if self.old_pose is not None:
+            old_pos = self.old_pose.position
+            cur_pos = cur_pose.position
+
+            dx = cur_pos.x - old_pos.x
+            dy = cur_pos.y - old_pos.y
+            dz = cur_pos.z - old_pos.z
+            
+            self.dist += math.sqrt(dx**2 + dy**2 + dz**2) # distance formula
+        self.old_pose = cur_pose
+
 
     def update_yaw(self, cur_orientation):
         """
         Helper to `odom_cb`.
         Updates `self.yaw` to current heading of robot.
         """
-        raise NotImplementedError
+        quaternion = (
+            cur_orientation.x,
+            cur_orientation.y,
+            cur_orientation.z,
+            cur_orientation.w
+        )
+        
+        euler = euler_from_quaternion(quaternion) # uses the method we were given
+        self.yaw = euler[2]
 
     def publish_data(self):
         """
@@ -42,8 +55,12 @@ class MyOdom:
         """
         # The `Point` object should be used simply as a data container for
         # `self.dist` and `self.yaw` so we can publish it on `my_odom`.
-        raise NotImplementedError
-        
+        point_msg = Point()
+        point_msg.x = self.dist
+        point_msg.y = self.yaw
+        point_msg.z = 0
+        self.my_odom_pub.publish(point_msg)      
+
 if __name__ == '__main__':
     rospy.init_node('my_odom')
     MyOdom()
